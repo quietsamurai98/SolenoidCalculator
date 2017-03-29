@@ -1,0 +1,24 @@
+div.text { 
+  margin: 0; 
+  padding: 0; 
+  padding-bottom: 0.25em; 
+} 
+
+div.text label { 
+  margin: 0; 
+  padding: 0; 
+  display: block; 
+  font-size: 100%; 
+  padding-top: .1em; 
+  padding-right: .25em; 
+  width: 12em;
+  text-align: left; 
+  float: left; 
+} 
+
+div.text number { 
+  margin: 0; 
+  padding: 0; 
+  display: block; 
+  font-size: 100%; 
+} 
