@@ -2,51 +2,122 @@
 <html lang="en">
     <head>
         <meta charset="utf-8" />
-        <title></title>
+        <title>Solenoid Calculator</title>
+        <link rel="stylesheet" type="text/css" href="index.css">
         <!--[if IE]>
         <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
         <![endif]-->
     </head>
     <body>
         <div>
-            <label for="inputWireLength">   Wire Length (meters)</label>
-            <input type="number" name="inputWireLength" id="inputWireLength" min="0" step="0.01"><br>
-
-            <label for="inputWireDiameter"> Wire Diameter (millimeters)</label>
-            <input type="number" name="inputWireDiameter" id="inputWireDiameter" min="0" step="0.001"><br>
-
-            <label for="inputCoreLength">   Core Length (centimeters)</label>
-            <input type="number" name="inputCoreLength" id="inputCoreLength" min="0" step="0.1"><br>
-
-            <label for="inputCoreDiameter"> Core Diameter (centimeters)</label>
-            <input type="number" name="inputCoreDiameter" id="inputCoreDiameter" min="0" step="0.1"><br>
-
+            <div>
+                <div style = "display: inline-block; margin: 10px 10px 10px 10px;">
+                    <div class="text"> 
+                        <label for="inputWireLength">   Wire Length (meters)</label>
+                        <input type="number" name="inputWireLength"     id="inputWireLength"    value="1"   min="0" step="0.01"><br>
+                    </div>
+                    <div class="text">
+                        <label for="inputWireDiameter"> Wire Diameter (millimeters)</label>
+                        <input type="number" name="inputWireDiameter"   id="inputWireDiameter"  value="1"   min="0" step="0.001"><br>
+                    </div>
+                    <div class="text">
+                        <label for="inputCoreLength">   Core Length (centimeters)</label>
+                        <input type="number" name="inputCoreLength"     id="inputCoreLength"    value="10"  min="0" step="0.1"><br>
+                    </div>
+                    <div class="text">
+                        <label for="inputCoreDiameter"> Core Diameter (centimeters)</label>
+                        <input type="number" name="inputCoreDiameter"   id="inputCoreDiameter"  value="5"   min="0" step="0.1"><br>
+                    </div>
+                    <br>
+                    <div class="text">
+                        <label for="outputTurnCount">   Total number of turns</label>
+                        <input type="number" name="outputTurnCount"   id="outputTurnCount"  readonly><br>
+                    </div>
+                    <div class="text">
+                        <label for="outputLayerCount">   Total number of layers</label>
+                        <input type="number" name="outputLayerCount"   id="outputLayerCount"  readonly><br>
+                    </div>
+                    <div class="text">
+                        <label for="outputCoilLength">   Arc length of coil (meters)</label>
+                        <input type="number" name="outputCoilLength"   id="outputCoilLength"  readonly><br>
+                    </div>
+                </div>
+                
+                <div style = "display: inline-block; margin: 10px 10px 10px 10px;">
+                    <div class="text"> 
+                        <label for="inputWireAmpacity">     Wire Ampacity (Amps)</label>
+                        <input type="number" name="inputWireAmpacity"     id="inputWireAmpacity"    value="1"   min="0" step="0.01"><br>
+                    </div>
+                    <div class="text">
+                        <label for="inputWireResistivity">  Wire Resistivity (Ω/meter)</label>
+                        <input type="number" name="inputWireResistivity"   id="inputWireResistivity"  value="1"   min="0" step="0.001"><br>
+                    </div>
+                    <div class="text">
+                        <label for="inputMaxVoltage">       Max Voltage (blank = ∞)</label>
+                        <input type="number" name="inputMaxVoltage"     id="inputMaxVoltage"    value="10"  min="0" step="0.1"><br>
+                    </div>
+                    <div class="text">
+                        <label for="inputCorePermeability"> Core Permeability (μ / μ<sub>0</sub>)</label>
+                        <input type="number" name="inputCorePermeability"   id="inputCorePermeability"  value="5"   min="0" step="0.1"><br>
+                    </div>
+                    <br>
+                    <div class="text">
+                        <label for="outputMagneticField">   Magnetic Field (teslas)</label>
+                        <input type="number" name="outputMagneticField"   id="outputMagneticField"  readonly><br>
+                    </div>
+                    <div class="text">
+                        <label for="outputInductance">      Inductance (Henries)</label>
+                        <input type="number" name="outputInductance"   id="outputInductance"  readonly><br>
+                    </div>
+                    <div class="text">
+                        <label for="outputPower">      Power (watts)</label>
+                        <input type="number" name="outputPower"   id="outputPower"  readonly><br>
+                    </div>
+                </div>
+            </div>
             
             <input type="submit" id="btnSubmit" value="Calculate" onclick="calculate()"/>
         </div>
+        
+        
+        
         <script>
-        function calculate(){
-            var wireLength  = parseFloat(document.getElementById('inputWireLength').value);
-            var wireDiameter= parseFloat(document.getElementById('inputWireDiameter').value)/1000.0;
-            var coreLength  = parseFloat(document.getElementById('inputCoreLength').value)/100.0;
-            var coreDiameter= parseFloat(document.getElementById('inputCoreDiameter').value)/100.0;
-
-            var turnsPerLayer = coreLength/wireDiameter;
-            var wireUsed = 0;
-            var realDiameter = coreDiameter+ wireDiameter*0.5;
-            var layerCount = 0;
-            while (wireUsed < wireLength){
-                wireUsed+= Math.PI * realDiameter * turnsPerLayer;
-                layerCount++;
-                realDiameter+=wireDiameter;
+            function calculate(){
+                var wireLength  = parseFloat(document.getElementById('inputWireLength').value);
+                var wireRadius  = parseFloat(document.getElementById('inputWireDiameter').value)/2000.0;    // value/1000 = diameter in meters, value/2000 = radius in meters
+                var coreLength  = parseFloat(document.getElementById('inputCoreLength').value)/100.0;       // value/100 = length in meters
+                var coreRadius  = parseFloat(document.getElementById('inputCoreDiameter').value)/200.0;     // value/100 = diameter in meters, value/200 = radius in meters
+                
+                var layerCount = 0;
+                var totalTurns = 0;
+                var coilLength = 0;
+                
+                var turnsPerLayer = coreLength / (2*wireRadius);
+                var turnRise = 2*wireRadius;
+                
+                
+                var turnRadius = coreRadius + wireRadius;
+                var turnLength = Math.sqrt( (turnRise*turnRise) + ((2 * Math.PI * turnRadius)*(2 * Math.PI * turnRadius)) );
+                
+                while ((coilLength + turnLength) < wireLength){
+                    for(var n = 0; (n<turnsPerLayer) && ((coilLength + turnLength) < wireLength); n++){
+                        coilLength+=turnLength;
+                        totalTurns++;
+                    }
+                    layerCount++;
+                    turnRadius+=wireRadius*2;
+                    turnLength = Math.sqrt( (turnRise*turnRise) + ((2 * Math.PI * turnRadius)*(2 * Math.PI * turnRadius)) );
+                }
+                
+                console.log("LAYERS: "+layerCount+"\nTOTAL TURNS: "+totalTurns+"\nCOIL LENGTH: "+coilLength);
+                outputDimensions(totalTurns, layerCount, coilLength);
             }
-            wireUsed -= Math.PI * realDiameter * turnsPerLayer;
-            layerCount--;
-            realDiameter-=wireDiameter;
-            var extraTurns = (wireLength-wireUsed)/(Math.PI * realDiameter);
-            var totalTurns = layerCount*turnsPerLayer+extraTurns;
-            console.log("LAYERS: "+layerCount+"\nEXTRA TURNS"+extraTurns+"\nTOTAL TURNS"+totalTurns);
-        }
+            
+            function outputDimensions(turns, layers, length){
+                document.getElementById('outputTurnCount').value = turns;
+                document.getElementById('outputLayerCount').value = layers;
+                document.getElementById('outputCoilLength').value = length;
+            }
         </script>
     </body>
 </html>
