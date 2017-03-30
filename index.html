@@ -14,64 +14,64 @@
                 <div style = "display: inline-block; margin: 10px 10px 10px 10px;">
                     <div class="text"> 
                         <label for="inputWireLength">   Wire Length (meters)</label>
-                        <input type="number" name="inputWireLength"     id="inputWireLength"    value="1"   min="0" step="0.01"><br>
+                        <input type="number" name="inputWireLength"     id="inputWireLength"    value="100"   min="0" step="any"><br>
                     </div>
                     <div class="text">
                         <label for="inputWireDiameter"> Wire Diameter (millimeters)</label>
-                        <input type="number" name="inputWireDiameter"   id="inputWireDiameter"  value="1"   min="0" step="0.001"><br>
+                        <input type="number" name="inputWireDiameter"   id="inputWireDiameter"  value="0.56"   min="0" step="any"><br>
                     </div>
                     <div class="text">
                         <label for="inputCoreLength">   Core Length (centimeters)</label>
-                        <input type="number" name="inputCoreLength"     id="inputCoreLength"    value="10"  min="0" step="0.1"><br>
+                        <input type="number" name="inputCoreLength"     id="inputCoreLength"    value="5"  min="0" step="any"><br>
                     </div>
                     <div class="text">
                         <label for="inputCoreDiameter"> Core Diameter (centimeters)</label>
-                        <input type="number" name="inputCoreDiameter"   id="inputCoreDiameter"  value="5"   min="0" step="0.1"><br>
+                        <input type="number" name="inputCoreDiameter"   id="inputCoreDiameter"  value="2.5"   min="0" step="any"><br>
                     </div>
                     <br>
                     <div class="text">
                         <label for="outputTurnCount">   Total number of turns</label>
-                        <input type="number" name="outputTurnCount"   id="outputTurnCount"  readonly><br>
+                        <input type="number" name="outputTurnCount"   id="outputTurnCount" step="any" readonly><br>
                     </div>
                     <div class="text">
                         <label for="outputLayerCount">   Total number of layers</label>
-                        <input type="number" name="outputLayerCount"   id="outputLayerCount"  readonly><br>
+                        <input type="number" name="outputLayerCount"   id="outputLayerCount" step="any" readonly><br>
                     </div>
                     <div class="text">
                         <label for="outputCoilLength">   Arc length of coil (meters)</label>
-                        <input type="number" name="outputCoilLength"   id="outputCoilLength"  readonly><br>
+                        <input type="number" name="outputCoilLength"   id="outputCoilLength" step="any" readonly><br>
                     </div>
                 </div>
                 
                 <div style = "display: inline-block; margin: 10px 10px 10px 10px;">
                     <div class="text"> 
                         <label for="inputWireAmpacity">     Wire Ampacity (Amps)</label>
-                        <input type="number" name="inputWireAmpacity"     id="inputWireAmpacity"    value="1"   min="0" step="0.01"><br>
+                        <input type="number" name="inputWireAmpacity"     id="inputWireAmpacity"    value="2"   min="0" step="any"><br>
                     </div>
                     <div class="text">
-                        <label for="inputWireResistivity">  Wire Resistivity (Ω/meter)</label>
-                        <input type="number" name="inputWireResistivity"   id="inputWireResistivity"  value="1"   min="0" step="0.001"><br>
+                        <label for="inputWireResistivity">  Wire Resistivity (Ω/km)</label>
+                        <input type="number" name="inputWireResistivity"   id="inputWireResistivity"  value="84.2"   min="0" step="any"><br>
                     </div>
                     <div class="text">
-                        <label for="inputMaxVoltage">       Max Voltage (blank = ∞)</label>
-                        <input type="number" name="inputMaxVoltage"     id="inputMaxVoltage"    value="10"  min="0" step="0.1"><br>
+                        <label for="inputAvailableVoltage"> Available Voltage (blank = ∞)</label>
+                        <input type="number" name="inputAvailableVoltage"     id="inputAvailableVoltage"    value="9"  min="0" step="any"><br>
                     </div>
                     <div class="text">
                         <label for="inputCorePermeability"> Core Permeability (μ / μ<sub>0</sub>)</label>
-                        <input type="number" name="inputCorePermeability"   id="inputCorePermeability"  value="5"   min="0" step="0.1"><br>
+                        <input type="number" name="inputCorePermeability"   id="inputCorePermeability"  value="1"   min="0" step="any"><br>
                     </div>
                     <br>
                     <div class="text">
                         <label for="outputMagneticField">   Magnetic Field (teslas)</label>
-                        <input type="number" name="outputMagneticField"   id="outputMagneticField"  readonly><br>
+                        <input type="number" name="outputMagneticField"   id="outputMagneticField" step="any" readonly><br>
                     </div>
                     <div class="text">
                         <label for="outputInductance">      Inductance (Henries)</label>
-                        <input type="number" name="outputInductance"   id="outputInductance"  readonly><br>
+                        <input type="number" name="outputInductance"   id="outputInductance" step="any" readonly><br>
                     </div>
                     <div class="text">
-                        <label for="outputPower">      Power (watts)</label>
-                        <input type="number" name="outputPower"   id="outputPower"  readonly><br>
+                        <label for="outputRequiredVoltage"> Required Voltage (volts)</label>
+                        <input type="number" name="outputRequiredVoltage"   id="outputRequiredVoltage" step="any" readonly><br>
                     </div>
                 </div>
             </div>
@@ -111,12 +111,41 @@
                 
                 console.log("LAYERS: "+layerCount+"\nTOTAL TURNS: "+totalTurns+"\nCOIL LENGTH: "+coilLength);
                 outputDimensions(totalTurns, layerCount, coilLength);
+                
+                var wireResistivity = parseFloat(document.getElementById('inputWireResistivity').value)/1000.0;
+                var wireAmpacity    = parseFloat(document.getElementById('inputWireAmpacity').value);
+                var corePermeability= parseFloat(document.getElementById('inputCorePermeability').value);
+                var availableVoltage= parseFloat(document.getElementById('inputAvailableVoltage').value);
+                
+                var resistance      = (wireResistivity*coilLength);
+                var current;
+                if(isEmpty(document.getElementById('inputAvailableVoltage').value)){
+                    current         = wireAmpacity;
+                } else {
+                    current         = Math.min(availableVoltage/(wireResistivity*coilLength), wireAmpacity);
+                }
+                
+                
+                var magneticField   = (Math.PI/2500000)*corePermeability*totalTurns*current/coreLength;
+                var inductance      = (Math.PI/2500000)*totalTurns*totalTurns*Math.PI*(coreRadius+layerCount*wireRadius)*(coreRadius+layerCount*wireRadius)/coilLength;
+                var power           = current*current*resistance;
+                
+                outputElectrical(magneticField, inductance, current*resistance);
             }
             
             function outputDimensions(turns, layers, length){
                 document.getElementById('outputTurnCount').value = turns;
                 document.getElementById('outputLayerCount').value = layers;
                 document.getElementById('outputCoilLength').value = length;
+            }
+            function outputElectrical(magneticField, inductance, voltage){
+                document.getElementById('outputMagneticField').value = magneticField;
+                document.getElementById('outputInductance').value = inductance;
+                document.getElementById('outputRequiredVoltage').value = voltage;
+            }
+            
+            function isEmpty(str){
+                return !str.replace(/^\s+/g, '').length; // boolean (`true` if field is empty)
             }
         </script>
     </body>
