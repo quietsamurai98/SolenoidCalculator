@@ -77,11 +77,17 @@
             </div>
             
             <input type="submit" id="btnSubmit" value="Calculate" onclick="calculate()"/>
+            <div id="canvasDiv">
+                <canvas id="canvas" width="480" height="320"></canvas>
+            </div>
         </div>
         
         
         
         <script>
+            var canvas = document.getElementById('canvas');
+            var ctx = canvas.getContext('2d');
+            
             function calculate(){
                 var wireLength  = parseFloat(document.getElementById('inputWireLength').value);
                 var wireRadius  = parseFloat(document.getElementById('inputWireDiameter').value)/2000.0;    // value/1000 = diameter in meters, value/2000 = radius in meters
@@ -146,6 +152,24 @@
             
             function isEmpty(str){
                 return !str.replace(/^\s+/g, '').length; // boolean (`true` if field is empty)
+            }
+            
+            
+            
+            function draw(turns, layers, turnsPerLayer, wireRadius, coreLength, coreRadius){
+              ctx.lineWidth=1;
+              ctx.beginPath();
+              var x = 0;
+              var y = 0;
+              for(var i=0; i<turnsPerLayer; i++){
+                
+              }
+            }
+
+            function circle(x,y,r){
+                ctx.beginPath();
+                ctx.arc(x,y,r,0,2*Math.PI);
+                ctx.stroke;
             }
         </script>
     </body>
