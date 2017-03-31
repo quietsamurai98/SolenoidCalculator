@@ -77,11 +77,17 @@
             </div>
             
             <input type="submit" id="btnSubmit" value="Calculate" onclick="calculate()"/>
+            <div id="canvasDiv">
+                <canvas id="canvas" width="0" height="0"></canvas>
+            </div>
         </div>
         
         
         
         <script>
+            var canvas = document.getElementById('canvas');
+            var ctx = canvas.getContext('2d');
+            
             function calculate(){
                 var wireLength  = parseFloat(document.getElementById('inputWireLength').value);
                 var wireRadius  = parseFloat(document.getElementById('inputWireDiameter').value)/2000.0;    // value/1000 = diameter in meters, value/2000 = radius in meters
@@ -92,7 +98,7 @@
                 var totalTurns = 0;
                 var coilLength = 0;
                 
-                var turnsPerLayer = coreLength / (2*wireRadius);
+                var turnsPerLayer = Math.floor(coreLength / (2*wireRadius));
                 var turnRise = 2*wireRadius;
                 
                 
@@ -131,6 +137,8 @@
                 var power           = current*current*resistance;
                 
                 outputElectrical(magneticField, inductance, current*resistance);
+                
+                drawSolenoid(totalTurns, layerCount, turnsPerLayer, wireRadius, coreLength, coreRadius);
             }
             
             function outputDimensions(turns, layers, length){
@@ -146,6 +154,63 @@
             
             function isEmpty(str){
                 return !str.replace(/^\s+/g, '').length; // boolean (`true` if field is empty)
+            }
+            
+            
+            
+            function drawSolenoid(turns, layers, turnsPerLayer, wireRadiusMeters, coreLengthMeters, coreRadiusMeters){
+                
+                var extraTurns = turns % turnsPerLayer;
+                var wireRadius = 2.5;
+                var fullLayers = layers-1;
+                var coreLength = wireRadius * 2 * turnsPerLayer;
+                var coreRadius = Math.round((coreLength/coreLengthMeters) * coreRadiusMeters);
+                var y = wireRadius*2;
+                
+                document.getElementById('canvas').height = y + y*2*layers + coreRadius*2;
+                document.getElementById('canvas').width = 2*wireRadius * (turnsPerLayer + 2) - y;
+                document.getElementById('canvas').style = "border:1px solid #000000;"
+                
+                drawLayer(y, extraTurns, wireRadius);
+                y+=wireRadius*2;
+                for(var i = 0; i < fullLayers; i++){
+                    drawLayer(y, turnsPerLayer, wireRadius);
+                    y+=wireRadius*2;
+                }
+                ctx.fillStyle = "#CBCDCD"
+                ctx.fillRect(wireRadius, y-wireRadius,coreLength,coreRadius*2);
+                ctx.rect(wireRadius, y-wireRadius,coreLength,coreRadius*2);
+                ctx.stroke();
+                y+=coreRadius*2;
+                for(var i = 0; i < fullLayers; i++){
+                    drawLayer(y, turnsPerLayer, wireRadius);
+                    y+=wireRadius*2;
+                }
+                //y+=wireRadius*2;
+                drawLayer(y, extraTurns, wireRadius);
+                
+            }
+            
+            function drawLayer(y, turnsPerLayer, wireRadius){
+                var x = wireRadius*2;
+                for(var i=0; i<turnsPerLayer; i++){
+                    circle(x,y,wireRadius);
+                    x+=wireRadius*2;
+                }
+            }
+
+            function circle(x,y,r){
+                ctx.lineWidth=1;
+            
+                ctx.fillStyle = "#B87333"
+                ctx.beginPath();
+                ctx.arc(x,y,r,0,2*Math.PI);
+                ctx.fill();
+                
+                ctx.strokeStyle = "#000000"
+                ctx.beginPath();
+                ctx.arc(x,y,r,0,2*Math.PI);
+                ctx.stroke();
             }
         </script>
     </body>
