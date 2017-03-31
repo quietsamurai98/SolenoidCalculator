@@ -78,6 +78,14 @@
             
             <input type="submit" id="btnSubmit" value="Calculate" onclick="calculate()"/>
             <div id="canvasDiv">
+                    <div class="text">
+                        <label for="inputLinesPerTesla"> Magnetic field lines per Tesla</label>
+                        <input type="number" name="inputLinesPerTesla"   id="inputLinesPerTesla"  value="1000"   min="0" step="1"><br>
+                    </div>
+                    <div class="text">
+                        <label for="inputWirePxls"> Wire diameter (pixels)</label>
+                        <input type="number" name="inputWirePxls"   id="inputWirePxls"  value="5"   min="0" step="1"><br>
+                    </div>
                 <canvas id="canvas" width="0" height="0"></canvas>
             </div>
         </div>
@@ -138,7 +146,7 @@
                 
                 outputElectrical(magneticField, inductance, current*resistance);
                 
-                drawSolenoid(totalTurns, layerCount, turnsPerLayer, wireRadius, coreLength, coreRadius);
+                drawSolenoid(totalTurns, layerCount, turnsPerLayer, wireRadius, coreLength, coreRadius, magneticField);
             }
             
             function outputDimensions(turns, layers, length){
@@ -158,41 +166,67 @@
             
             
             
-            function drawSolenoid(turns, layers, turnsPerLayer, wireRadiusMeters, coreLengthMeters, coreRadiusMeters){
+            function drawSolenoid(turns, layers, turnsPerLayer, wireRadiusMeters, coreLengthMeters, coreRadiusMeters, magneticField){
                 
                 var extraTurns = turns % turnsPerLayer;
-                var wireRadius = 2.5;
+                var wireRadius = (document.getElementById('inputWirePxls').value | 0)/2;
                 var fullLayers = layers-1;
                 var coreLength = wireRadius * 2 * turnsPerLayer;
                 var coreRadius = Math.round((coreLength/coreLengthMeters) * coreRadiusMeters);
+                var fieldLines = Math.floor(magneticField*document.getElementById('inputLinesPerTesla').value);
+                fieldLines+=fieldLines%2;
                 var y = wireRadius*2;
-                
+                var pxlsPerCm = wireRadius/(100*wireRadiusMeters);
+                var width = 2*wireRadius*turnsPerLayer + 4*pxlsPerCm;
                 document.getElementById('canvas').height = y + y*2*layers + coreRadius*2;
-                document.getElementById('canvas').width = 2*wireRadius * (turnsPerLayer + 2) - y;
+                document.getElementById('canvas').width = width;
                 document.getElementById('canvas').style = "border:1px solid #000000;"
                 
-                drawLayer(y, extraTurns, wireRadius);
+                drawScale(pxlsPerCm);
+                //draw extra wires
+                drawLayer(y, extraTurns, wireRadius, pxlsPerCm);
+                
+                //draw upper block of wires
                 y+=wireRadius*2;
                 for(var i = 0; i < fullLayers; i++){
-                    drawLayer(y, turnsPerLayer, wireRadius);
+                    drawLayer(y, turnsPerLayer, wireRadius, pxlsPerCm);
                     y+=wireRadius*2;
                 }
-                ctx.fillStyle = "#CBCDCD"
-                ctx.fillRect(wireRadius, y-wireRadius,coreLength,coreRadius*2);
-                ctx.rect(wireRadius, y-wireRadius,coreLength,coreRadius*2);
+                
+                //draw core
+                ctx.fillStyle = "#87898C"
+                ctx.fillRect(2*pxlsPerCm, y-wireRadius,coreLength,coreRadius*2);
+                ctx.rect(2*pxlsPerCm, y-wireRadius,coreLength,coreRadius*2);
                 ctx.stroke();
+                
+                //draw field lines
+                var fieldYTop = y+wireRadius;
+                var fieldYBottom = y+2*coreRadius-3*wireRadius;
+                var fieldLineSpacing = (fieldYBottom-fieldYTop)/fieldLines;
+                ctx.strokeStyle = "#7DF9FF"
+                for(var i = 0; i<=fieldLines/2; i++){
+                    ctx.beginPath();
+                    ctx.moveTo(0,Math.floor(fieldYTop + fieldLineSpacing*i)+0.5);
+                    ctx.lineTo(width,Math.floor(fieldYTop + fieldLineSpacing*i)+0.5);
+                    ctx.moveTo(0,Math.floor(fieldYBottom - fieldLineSpacing*i)+0.5);
+                    ctx.lineTo(width,Math.floor(fieldYBottom - fieldLineSpacing*i)+0.5);
+                    ctx.stroke();
+                }
+                
+                //draw lower block of wires
                 y+=coreRadius*2;
                 for(var i = 0; i < fullLayers; i++){
-                    drawLayer(y, turnsPerLayer, wireRadius);
+                    drawLayer(y, turnsPerLayer, wireRadius, pxlsPerCm);
                     y+=wireRadius*2;
                 }
-                //y+=wireRadius*2;
-                drawLayer(y, extraTurns, wireRadius);
+                
+                //draw extra wires
+                drawLayer(y, extraTurns, wireRadius, pxlsPerCm);
                 
             }
             
-            function drawLayer(y, turnsPerLayer, wireRadius){
-                var x = wireRadius*2;
+            function drawLayer(y, turnsPerLayer, wireRadius, pxlsPerCm){
+                var x = 2*pxlsPerCm+wireRadius;
                 for(var i=0; i<turnsPerLayer; i++){
                     circle(x,y,wireRadius);
                     x+=wireRadius*2;
@@ -211,6 +245,23 @@
                 ctx.beginPath();
                 ctx.arc(x,y,r,0,2*Math.PI);
                 ctx.stroke();
+            }
+            
+            function drawScale(pxlsPerCm){
+                ctx.beginPath();
+                ctx.moveTo(pxlsPerCm/2,pxlsPerCm/4);
+                ctx.lineTo(3*pxlsPerCm/2,pxlsPerCm/4);
+                
+                ctx.moveTo(pxlsPerCm/2,pxlsPerCm/8);
+                ctx.lineTo(pxlsPerCm/2,3*pxlsPerCm/8);
+                
+                ctx.moveTo(3*pxlsPerCm/2,pxlsPerCm/8);
+                ctx.lineTo(3*pxlsPerCm/2,3*pxlsPerCm/8);
+                
+                ctx.stroke();
+                
+                ctx.font = "15px 'Courier New', Courier, monospace";
+                ctx.fillText("1cm",pxlsPerCm-15,pxlsPerCm/2);
             }
         </script>
     </body>
